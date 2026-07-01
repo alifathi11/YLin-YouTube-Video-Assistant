@@ -1,0 +1,20 @@
+CREATE EXTENSION IF NOT EXISTS vector; 
+
+CREATE TABLE IF NOT EXISTS videos (
+	id SERIAL PRIMARY KEY,
+	video_id TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chunks (
+	id SERIAL PRIMARY KEY,
+	video_id TEXT REFERENCES videos(video_id),
+
+	chunk_id TEXT UNIQUE NOT NULL,
+
+	start_time FLOAT NOT NULL,
+	end_time FLOAT NOT NULL,
+
+	text TEXT NOT NULL ,
+
+	embedding VECTOR(384)
+);

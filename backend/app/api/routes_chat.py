@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.dependencies import embedding_service, vector_store, rag_service
+from app.dependencies import rag_service
 from app.schemas.chat import AskQuestionRequest, AskQuestionResponse, Citation
 
 router = APIRouter(prefix="/chat", tags=["chat"])

@@ -5,6 +5,7 @@ from app.config import settings
 from app.api.routes_health import router as health_router
 from app.api.routes_videos import router as videos_router
 from app.api.routes_chat import router as chat_router 
+from app.dependencies import db_initializer
 
 app = FastAPI(
 	title=settings.app_name,
@@ -22,3 +23,10 @@ app.add_middleware(
 app.include_router(health_router, prefix=settings.api_prefix)
 app.include_router(videos_router, prefix=settings.api_prefix)
 app.include_router(chat_router, prefix=settings.api_prefix)
+
+#######################################################################
+############################ DEPRECATED ###############################
+@app.on_event("startup")
+def startup():
+	db_initializer.run_schema("postgres/init/01_init_schema.sql")
+#######################################################################

@@ -7,3 +7,5 @@ youtube-transcript-api
 sentence-transformers
 numpy
 openai
+pgvector
+psycopg2
