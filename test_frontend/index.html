@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube RAG Test</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: 40px auto; }
+    input, button { padding: 10px; margin: 5px; width: 100%; }
+    .box { margin-top: 20px; padding: 10px; border: 1px solid #ddd; }
+    pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+<h2>YouTube RAG Tester</h2>
+
+<input id="url" placeholder="YouTube URL" />
+<button onclick="indexVideo()">Index Video</button>
+
+<div class="box">
+  <h3>Ask Question</h3>
+  <input id="videoId" placeholder="Video ID (auto or manual)" />
+  <input id="question" placeholder="Your question" />
+  <button onclick="ask()">Ask</button>
+</div>
+
+<div class="box">
+  <h3>Response</h3>
+  <pre id="output"></pre>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

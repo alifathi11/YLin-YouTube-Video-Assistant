@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "YLin | YouTube Video Assistant",
+  "version": "0.1",
+  "description": "Chat with YouTube videos using your RAG backend",
+  "permissions": ["activeTab"],
+  "host_permissions": [
+    "http://localhost:8000/*",
+    "https://www.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
