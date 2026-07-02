@@ -9,3 +9,4 @@ numpy
 openai
 pgvector
 psycopg2
+yt-dlp

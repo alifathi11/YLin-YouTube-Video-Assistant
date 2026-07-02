@@ -11,10 +11,8 @@ from app.schemas.video import (
 	IndexVideoResponse, 
 	PreviewChunksResponse
 )
-
-from app.services.chunking_service import ChunkingService
-from app.services.transcript_service import TranscriptFetchError, TranscriptService
-from app.utils.youtube import extract_video_id
+from app.services.transcript_service import TranscriptFetchError
+from app.utils.youtube import extract_video_id, get_youtube_metadata
 
 router = APIRouter(prefix="/videos", tags=["videos"])
 
@@ -22,10 +20,11 @@ router = APIRouter(prefix="/videos", tags=["videos"])
 def index_video(request: IndexVideoRequest):
 	try: 
 		video_id = extract_video_id(request.url)
+		meta = get_youtube_metadata(request.url)
 	except ValueError as exc: 
 		raise HTTPException(status_code=400, detail=str(exc))
 
-	segments_count, chunks_count = ingestion_service.ingest(video_id)
+	segments_count, chunks_count = ingestion_service.ingest(video_id, meta)
 
 	return IndexVideoResponse(
 		video_id=video_id,

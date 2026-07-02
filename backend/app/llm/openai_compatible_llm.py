@@ -4,13 +4,14 @@ from app.llm.base import LLMProvider
 from app.llm.prompts import build_video_qa_messages
 from app.schemas.chat import Citation, LLMAnswer
 from app.schemas.chunk import TranscriptChunk
+from app.debug.rag_trace import RAGTrace
 
 class OpenAICompatibleLLM(LLMProvider):
 	def __init__(
 		self,
 		api_key: str,
 		model: str, 
-		base_url: str | None = None 
+		base_url: str | None = None,
 	):
 		if not api_key: 
 			raise ValueError("api_key is required for OpenAICompatibleLLM")
@@ -30,7 +31,9 @@ class OpenAICompatibleLLM(LLMProvider):
 	def answer(
 		self,
 		question: str, 
-		chunks: list[TranscriptChunk]
+		chunks: list[TranscriptChunk],
+		meta: dict | None = None,
+		trace: RAGTrace | None = None
 	) -> LLMAnswer:
 		if not chunks: 
 			return LLMAnswer(
@@ -40,8 +43,13 @@ class OpenAICompatibleLLM(LLMProvider):
 		
 		messages = build_video_qa_messages(
 			question=question,
-			chunks=chunks
+			chunks=chunks,
+			meta=meta
 		)
+
+		if trace: 
+			trace.prompt = messages[1]["content"]
+			trace.log("PROMPT", messages[1]["content"])
 
 		response = self.client.chat.completions.create(
 			model=self.model,
@@ -57,7 +65,7 @@ class OpenAICompatibleLLM(LLMProvider):
 				end=chunk.end,
 				text=self._shorten(chunk.text, max_chars=500)
 			)
-			for chunk in chunks[:3]
+			for chunk in chunks[:1] # Temporary 
 		]
 
 		return LLMAnswer(

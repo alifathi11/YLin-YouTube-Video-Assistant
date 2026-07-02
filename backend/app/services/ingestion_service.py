@@ -13,7 +13,7 @@ class IngestionService:
 		self.embedding_service = embedding_service 
 		self.vector_service = vector_service
 
-	def ingest(self, video_id: str): 
+	def ingest(self, video_id: str, meta: dict): 
 		existing = self.db.fetchall(
 			"SELECT 1 FROM videos WHERE video_id = %s",
 			(video_id,)
@@ -25,8 +25,20 @@ class IngestionService:
 		segments = self.transcript_service.fetch_transcript(video_id)
 
 		self.db.execute(
-			"INSERT INTO videos (video_id) VALUES (%s) ON CONFLICT DO NOTHING",
-			(video_id,)
+			"""
+			INSERT INTO videos 
+			(video_id, video_title, video_description, video_duration, video_upload_date, channel_name) 
+			VALUES (%s, %s, %s, %s, %s, %s) 
+			ON CONFLICT DO NOTHING
+			""",
+			(
+				video_id, 
+				meta["title"], 
+				meta["description"], 
+				meta["duration"], 
+				meta["upload_date"], 
+				meta["channel_name"]
+			)
 		)
 
 		chunks = self.chunking_service.create_chunks(video_id, segments)

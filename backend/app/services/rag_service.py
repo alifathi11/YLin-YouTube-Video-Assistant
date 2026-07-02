@@ -17,13 +17,37 @@ class RagService:
 	def ask(
 		self,
 		video_id: str, 
-		question: str
+		question: str,
+		trace=None
 	) -> LLMAnswer: 
+		
+		if trace: 
+			trace.query = question
+			trace.log("QUERY", question)
+		
 		query_embedding = self.embedding_service.embed_query(question)
 
-		chunks = self.vector_service.search(query_embedding, video_id)
+		if trace: 
+			trace.query_embedding = query_embedding
+			trace.log("EMBEDDING", query_embedding[:5])
 
-		return self.llm_provider.answer(
+		chunks, meta = self.vector_service.search(query_embedding, video_id)
+
+		if trace: 
+			trace.retrieved_chunks_raw = chunks
+			trace.meta = meta 
+			trace.log("RAW CHUNKS", chunks)
+			trace.log("META", meta)
+
+		response = self.llm_provider.answer(
 			question=question,
-			chunks=chunks
+			chunks=chunks,
+			meta=meta,
+			trace=trace
 		)
+
+		if trace: 
+			trace.response = response
+			trace.log("FINAL RESPONSE", response)
+
+		return response

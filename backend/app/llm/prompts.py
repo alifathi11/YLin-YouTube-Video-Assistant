@@ -2,23 +2,24 @@ from app.schemas.chunk import TranscriptChunk
 
 def build_video_qa_messages(
 	question: str, 
-	chunks: list[TranscriptChunk]
+	chunks: list[TranscriptChunk],
+	meta: dict | None = None
 ) -> list[dict]:
+	
+	meta_text = _format_meta(meta)
 	context_text = _format_chunks(chunks)
 
 	system_prompt = (
 		"You are a YouTube video RAG assistant.\n"
-		"Answer the user's question using only the provided transcript chunks.\n"
-		"Do not use outside knowledge.\n"
-		"If the transcript chunks do not contain enough information, say that the video does not contain enough information to answer.\n"
-		"Keep the answer clear and concise.\n"
-		"Do not invent timestamps.\n"
+		"Answer using ONLY the provided metadata and transcript chunks.\n"
+		"If information is not in them, say it's not available in the video.\n"
+		"Do not hallucinate.\n"
 	)
 
 	user_prompt = (
-		f"Question:\n{question}\n\n"
-		f"Transcript chunks:\n{context_text}\n\n"
-		"Write the answer based only on these chunks."
+		f"{meta_text}\n\n"
+		f"TRANSCRIPT CHUNKS:\n{context_text}\n\n"
+		f"QUESTION:\n{question}\n"
 	)
 
 	return [
@@ -53,3 +54,16 @@ def _format_time(seconds: float) -> str:
 	remaining_seconds = total_seconds % 60
 
 	return f"{minutes:02d}:{remaining_seconds:02d}"
+
+def _format_meta(meta: dict | None) -> str:
+    if not meta:
+        return "No metadata available."
+
+    return (
+        "VIDEO METADATA:\n"
+        f"title: {meta.get('title')}\n"
+        f"description: {meta.get('description')}\n"
+        f"duration: {meta.get('duration')}\n"
+        f"upload_date: {meta.get('upload_date')}\n"
+        f"channel_name: {meta.get('channel_name')}\n"
+    )
