@@ -35,27 +35,80 @@ function createUI() {
     root.id = "rag-root";
 
     root.innerHTML = `
-        <div id="rag-header">🎥 YLin | Video Assistant</div>
+        <div id="rag-header">
+            <div id="rag-brand">
+                <div id="rag-logo">Y</div>
+                <div id="rag-title">
+                    <strong>YLin</strong>
+                    <span>Video Assistant</span>
+                </div>
+            </div>
+            <button
+                id="rag-close"
+                type="button"
+                aria-label="Close assistant"
+                title="Close assistant"
+            >×</button>
+        </div>
 
-        <div id="rag-chat"></div>
+        <div id="rag-chat">
+            <div id="rag-welcome">
+                <strong>Ask about this video</strong>
+                <span>Get answers with clickable timestamps.</span>
+            </div>
+        </div>
 
         <div id="rag-input-box">
             <input id="rag-input" placeholder="Ask anything about this video..." />
-            <button id="rag-send">➤</button>
+            <button
+                id="rag-send"
+                type="button"
+                aria-label="Send question"
+                title="Send question"
+            >➤</button>
         </div>
     `;
 
+    const launcher = document.createElement("button");
+    launcher.id = "rag-launcher";
+    launcher.type = "button";
+    launcher.setAttribute("aria-label", "Open YLin Video Assistant");
+    launcher.setAttribute("aria-expanded", "true");
+    launcher.title = "Open YLin Video Assistant";
+    launcher.textContent = "Y";
+
     document.body.appendChild(root);
+    document.body.appendChild(launcher);
+
+    function setPanelOpen(isOpen) {
+        root.classList.toggle("is-closed", !isOpen);
+        launcher.classList.toggle("is-visible", !isOpen);
+        launcher.setAttribute("aria-expanded", String(isOpen));
+
+        if (isOpen) {
+            setTimeout(() => document.getElementById("rag-input")?.focus(), 220);
+        }
+    }
 
     document.getElementById("rag-send").onclick = ask;
+    document.getElementById("rag-close").onclick = () => setPanelOpen(false);
+    launcher.onclick = () => setPanelOpen(true);
 
     document.getElementById("rag-input").addEventListener("keydown", (e) => {
         if (e.key === "Enter") ask();
     });
 
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !root.classList.contains("is-closed")) {
+            setPanelOpen(false);
+        }
+    });
+
     document.addEventListener("click", (e) => {
-        if (e.target.classList.contains("citation")) {
-            const index = e.target.dataset.index;
+        const citation = e.target.closest(".citation");
+
+        if (citation) {
+            const index = citation.dataset.index;
             const c = lastCitations[index];
             if (c) seekVideo(c.start);
         }
@@ -106,6 +159,9 @@ function typeText(element, text, speed = 8) {
 
 function addMessage(role, text, citations = null) {
     const chat = document.getElementById("rag-chat");
+    const welcome = document.getElementById("rag-welcome");
+
+    if (welcome) welcome.remove();
 
     const msg = document.createElement("div");
     msg.className = `msg ${role}`;

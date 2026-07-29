@@ -3,10 +3,10 @@ uvicorn[standard]
 pydantic 
 pydantic-settings
 python-dotenv
-youtube-transcript-api
+youtube-transcript-api==1.2.4
 sentence-transformers
 numpy
 openai
 pgvector
-psycopg2
+psycopg2-binary
 yt-dlp
